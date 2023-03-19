@@ -1,43 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>Cool Gallery</title>
+    <link rel="stylesheet" href="assets/css/cool-3d-gallery.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        background-color: transparent;
+        margin: 0;
+        font-family: Helvetica, sans-serif;
+        overflow: hidden;
+      }
+
+      a {
+        color: #ffffff;
+      }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <div id="container" style="position: absolute; width: 100%; height: 100%"></div>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <div
+      style="
+        position: absolute;
+        width: 100%;
+        color: #ffffff;
+        padding: 5px;
+        font-family: Monospace, serif;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 1;
+      "
+    >
+      <!-- jQuery Cool Gallery by <i>fanguitocoder</i> <br> -->
+      Press <b>ALT+N</b> to change gallery display mode
+    </div>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    <script>
+      let getParamValue = function () {
+        var url = window.location.search.substring(1); //get rid of "?" in querystring
+        var qArray = url.split("&"); //get key-value pairs
+        let result = {};
+        for (var i = 0; i < qArray.length; i++) {
+          var pArr = qArray[i].split("="); //split key and value
+          result[pArr[0]] = pArr[1];
+        }
+        return result;
+      };
+
+      $(document).ready(function () {
+        const parseData = getParamValue();
+        parseData.param = JSON.parse(`"${parseData.param.replaceAll("%22", '\\"')}"`);
+
+        $.ajax({
+          type: "POST",
+          url: parseData.url,
+          data: parseData.param,
+          headers: { "Content-Type": "application/json" },
+          success: function (res, status) {
+            if (res.code === 0) {
+              let result = [];
+              for (var i = 0; i < 150 ; i++) {
+                const nft = res.data[i % res.data.length];
+                result.push( { image: `${parseData.upload}${nft.logoURL}`, description: nft.description })
+              }
+              
+              $("#container").C3DGallery({ data: result });
+            } else {
+              alert("Sphere View load error");
+            }
+          },
+          error: function (data, status) {
+              alert("Sphere View load error 0");
+          },
+        });
+      });
+    </script>
+
+    <script src="./src/scripts.js"></script>
+    <!-- <script src="./src/data.js"></script> -->
+    <script src="./src/jquery.cool-3d-gallery.min.js"></script>
   </body>
 </html>
