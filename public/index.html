@@ -2,7 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
     <title>Cool Gallery</title>
     <link rel="stylesheet" href="assets/css/cool-3d-gallery.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -26,7 +29,10 @@
     </style>
   </head>
   <body>
-    <div id="container" style="position: absolute; width: 100%; height: 100%"></div>
+    <div
+      id="container"
+      style="position: absolute; width: 100%; height: 100%"
+    ></div>
 
     <div
       style="
@@ -59,7 +65,9 @@
 
       $(document).ready(function () {
         const parseData = getParamValue();
-        parseData.param = JSON.parse(`"${parseData.param.replaceAll("%22", '\\"')}"`);
+        parseData.param = JSON.parse(
+          `"${parseData.param.replaceAll("%22", '\\"')}"`
+        );
 
         $.ajax({
           type: "POST",
@@ -69,18 +77,25 @@
           success: function (res, status) {
             if (res.code === 0) {
               let result = [];
-              for (var i = 0; i < 150 ; i++) {
+              for (var i = 0; i < 150; i++) {
                 const nft = res.data[i % res.data.length];
-                result.push( { image: `${parseData.upload}${nft.logoURL}`, description: nft.description })
+                result.push({
+                  image: `${
+                    nft.fileType === 1
+                      ? parseData.ipfsGateway
+                      : parseData.upload
+                  }${nft.logoURL}`,
+                  description: nft.description,
+                });
               }
-              
+
               $("#container").C3DGallery({ data: result });
             } else {
               alert("Sphere View load error");
             }
           },
           error: function (data, status) {
-              alert("Sphere View load error 0");
+            alert("Sphere View load error 0");
           },
         });
       });
